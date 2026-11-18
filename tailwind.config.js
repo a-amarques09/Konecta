@@ -1,0 +1,68 @@
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+    content: [
+        './pages/**/*.{js,ts,jsx,tsx}',
+        './components/**/*.{js,ts,jsx,tsx}',
+    ],
+    theme: {
+        extend: {
+            colors: {
+                bg: 'var(--tp-bg)',
+                canvas: 'var(--tp-canvas)',
+                surf: 'var(--tp-surf)',
+                'surf-2': 'var(--tp-surf-2)',
+                ink: 'var(--tp-ink)',
+                mute: 'var(--tp-mute)',
+                acc: 'var(--tp-acc)',
+                'acc-2': 'var(--tp-acc-2)',
+                'acc-ink': 'var(--tp-acc-ink)',
+                line: 'var(--tp-line)',
+            },
+            backgroundImage: {
+                grad: 'var(--tp-grad)',
+                tex: 'var(--tp-tex)',
+            },
+            borderRadius: {
+                DEFAULT: 'var(--tp-r)',
+                sm: 'var(--tp-r-sm)',
+                lg: 'var(--tp-r-lg)',
+                btn: 'var(--tp-r-btn)',
+                img: 'var(--tp-img-r)',
+            },
+            borderWidth: { theme: 'var(--tp-bw)' },
+            boxShadow: {
+                theme: 'var(--tp-sh)',
+                'theme-sm': 'var(--tp-sh-sm)',
+                img: 'var(--tp-img-sh)',
+            },
+            fontFamily: {
+                display: 'var(--tp-font-display)',
+                body: 'var(--tp-font-body)',
+                mono: 'var(--tp-font-mono)',
+            },
+            fontSize: {
+                hero: ['var(--tp-hero)', { lineHeight: '1.02' }],
+            },
+            fontWeight: { display: 'var(--tp-w-display)' },
+            letterSpacing: { display: 'var(--tp-track-display)' },
+            backdropBlur: { theme: 'var(--tp-blur)' },
+            transitionDuration: { theme: 'var(--tp-dur)', slow: 'var(--tp-dur-slow)' },
+            transitionTimingFunction: { theme: 'var(--tp-ease)' },
+            scale: { press: 'var(--tp-press)' },
+            aspectRatio: { img: 'var(--tp-img-ar)' },
+            maxWidth: { shell: '1160px' },
+            animation: {
+                pop: 'tp-pop var(--tp-dur) var(--tp-ease) both',
+                up: 'tp-up calc(var(--tp-dur) * 2.4) var(--tp-ease) both',
+                sheet: 'tp-sheet calc(var(--tp-dur) * 3) var(--tp-ease) both',
+                shake: 'tp-shake 500ms var(--tp-ease) 1',
+                breathe: 'tp-breathe 3.4s var(--tp-ease) infinite',
+                float: 'tp-float 4s ease-in-out infinite',
+                shimmer: 'tp-shimmer 1.4s linear infinite',
+                spin: 'tp-spin 800ms linear infinite',
+                tilt: 'tp-tilt 2.6s ease-in-out infinite',
+            },
+        },
+    },
+    plugins: [],
+};
