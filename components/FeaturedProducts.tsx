@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { prisma } from '@/lib/prisma';
 import Image from 'next/image';
 
 interface ProductData {
     id: string;
     name: string;
+    slug: string;
     price: number;
     currency: string;
     city: string;
@@ -31,34 +31,21 @@ const FeaturedProducts: React.FC = () => {
 
     const loadFeaturedProducts = async () => {
         try {
-            const productData = await prisma.product.findMany({
-                where: {
-                    isActive: true,
-                    isFeatured: true,
-                },
-                include: {
-                    seller: {
-                        include: {
-                            sellerProfile: true,
-                        },
-                    },
-                    images: {
-                        where: { isPrimary: true },
-                        take: 1,
-                    },
-                },
-                orderBy: { createdAt: 'desc' },
-                take: 8,
-            });
+            const response = await fetch('/api/products/featured');
+            if (!response.ok) {
+                throw new Error('Failed to fetch products');
+            }
+            const productData = await response.json();
 
             setProducts(
                 productData.map((p: any) => ({
                     id: p.id,
                     name: p.name,
-                    price: Number(p.price),
+                    price: p.price,
                     currency: p.currency,
                     city: p.city,
                     country: p.country,
+                    slug: p.slug,
                     images: p.images,
                     seller: {
                         id: p.seller.id,
