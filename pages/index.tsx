@@ -3,6 +3,7 @@ import Navbar from '../components/navbar';
 import HeroSection from '../components/HeroSection';
 import CategoriesSection from '../components/CategoriesSection';
 import FeaturedProducts from '../components/FeaturedProducts';
+import FeaturedProfessionals from '../components/FeaturedProfessionals';
 import BusinessSection from '../components/BusinessSection';
 import LookingForSomething from '../components/LookingForSomething';
 import Footer from '../components/Footer';
@@ -22,7 +23,10 @@ const Home: React.FC = () => {
             {/* Featured Products Section */}
             <FeaturedProducts />
 
-            {/* Business and Professionals Section */}
+            {/* Featured Professionals Section */}
+            <FeaturedProfessionals />
+
+            {/* Discover Businesses Section */}
             <BusinessSection />
 
             {/* Looking for Something Section */}

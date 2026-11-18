@@ -1,3 +1,4 @@
+import Image from 'next/image';
 
 const businesses = [
     {
@@ -30,19 +31,27 @@ const BusinessSection: React.FC = () => {
     return (
         <section className="bg-white py-16 px-6">
             <h2 className="text-3xl font-bold text-[#101B35] text-center mb-8">
-                Empresas e Profissionais
+                Descubra Empresas
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
                 {businesses.map((business, index) => (
                     <div
                         key={index}
-                        className="bg-[#F5F7FA] rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300"
+                        className="bg-[#F5F7FA] rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 border border-gray-100"
                     >
-                        <img
-                            src={business.image}
-                            alt={business.name}
-                            className="w-full h-40 object-cover rounded-t-lg"
-                        />
+                        <div className="relative h-40 overflow-hidden rounded-t-lg bg-gray-200">
+                            <Image
+                                src={business.image}
+                                alt={business.name}
+                                fill
+                                className="object-cover"
+                                sizes="(max-width: 640px) 48vw, (max-width: 1024px) 24vw, 12vw"
+                                priority={false}
+                                loading="lazy"
+                                placeholder="blur"
+                                blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAf/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAVAQEBAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwA/AD//2Q=="
+                            />
+                        </div>
                         <div className="p-4">
                             <h3 className="text-lg font-semibold text-[#101B35]">
                                 {business.name}
