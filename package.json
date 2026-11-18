@@ -3,14 +3,18 @@
     "version": "0.1.0",
     "private": true,
     "scripts": {
-        "dev": "next dev",
+        "dev": "next dev -p 3100 -H 0.0.0.0",
         "build": "next build",
         "start": "next start",
         "lint": "next lint",
         "typecheck": "tsc --noEmit"
     },
     "dependencies": {
+        "@tailwindcss/postcss7-compat": "^2.2.17",
+        "glob": "^14.0.6",
+        "lru-cache": "^11.5.3",
         "next": "^16.4.6",
+        "picomatch": "^4.0.7",
         "react": "18.3.1",
         "react-dom": "18.3.1",
         "tape": "^5.10.3"
@@ -20,8 +24,8 @@
         "@types/react": "18.3.3",
         "@types/react-dom": "18.3.0",
         "autoprefixer": "10.4.19",
-        "postcss": "8.4.39",
-        "tailwindcss": "3.4.6",
+        "postcss": "^8.5.33",
+        "tailwindcss": "^3.4.1",
         "typescript": "5.5.3"
     }
 }

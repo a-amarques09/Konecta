@@ -1,5 +1,4 @@
 // filepath: /Users/LUZIA/Documentos PS Abel Marques/Amaro/Visual code/Konecta/pages/index.tsx
-import React from 'react';
 import Navbar from '../components/navbar';
 import HeroSection from '../components/HeroSection';
 import CategoriesSection from '../components/CategoriesSection';
@@ -35,8 +34,5 @@ const Home: React.FC = () => {
 
     );
 };
-<div className="bg-blue-500 text-white p-4">
-    Tailwind CSS is working!
-</div>
 export default Home;
 
