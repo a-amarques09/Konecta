@@ -34,6 +34,7 @@ interface ProductDetailData {
             phone: string | null;
             email: string | null;
             website: string | null;
+            city: string | null;
             isVerified: boolean;
             rating: number;
             totalSales: number;
@@ -111,7 +112,20 @@ const ProductDetail: React.FC = () => {
                         name: productData.seller.name,
                         email: productData.seller.email,
                         image: productData.seller.image,
-                        sellerProfile: productData.seller.sellerProfile,
+                        sellerProfile: productData.seller.sellerProfile
+                            ? {
+                                businessName: productData.seller.sellerProfile.businessName,
+                                businessType: productData.seller.sellerProfile.businessType,
+                                description: productData.seller.sellerProfile.description,
+                                phone: productData.seller.sellerProfile.phone,
+                                email: productData.seller.sellerProfile.email,
+                                website: productData.seller.sellerProfile.website,
+                                city: productData.seller.sellerProfile.city,
+                                isVerified: productData.seller.sellerProfile.isVerified,
+                                rating: Number(productData.seller.sellerProfile.rating),
+                                totalSales: productData.seller.sellerProfile.totalSales,
+                            }
+                            : null,
                     },
                     category: productData.category,
                     images: productData.images,
@@ -230,8 +244,8 @@ const ProductDetail: React.FC = () => {
                                             key={index}
                                             onClick={() => setActiveImageIndex(index)}
                                             className={`w-2 h-2 rounded-full transition-colors ${activeImageIndex === index
-                                                    ? 'bg-[#2563EB]'
-                                                    : 'bg-white/50 hover:bg-white/80'
+                                                ? 'bg-[#2563EB]'
+                                                : 'bg-white/50 hover:bg-white/80'
                                                 }`}
                                         />
                                     ))}
@@ -245,8 +259,8 @@ const ProductDetail: React.FC = () => {
                                     key={image.id}
                                     onClick={() => setActiveImageIndex(index)}
                                     className={`aspect-square bg-gray-200 rounded-md overflow-hidden border-2 ${activeImageIndex === index
-                                            ? 'border-[#2563EB]'
-                                            : 'border-transparent hover:border-gray-300'
+                                        ? 'border-[#2563EB]'
+                                        : 'border-transparent hover:border-gray-300'
                                         }`}
                                 >
                                     <Image

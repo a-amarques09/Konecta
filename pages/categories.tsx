@@ -11,6 +11,7 @@ interface CategoryData {
     description: string | null;
     image: string | null;
     parentId: string | null;
+    children?: CategoryData[];
     _count: {
         products: number;
     };

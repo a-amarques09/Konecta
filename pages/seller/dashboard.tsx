@@ -35,15 +35,19 @@ const SellerDashboard: React.FC = () => {
             const profile = await prisma.sellerProfile.findUnique({
                 where: { userId: session!.user.id },
                 include: {
-                    products: {
+                    user: {
                         select: {
-                            id: true,
-                            name: true,
-                            price: true,
-                            isActive: true,
-                            createdAt: true,
-                            _count: {
-                                select: { orderItems: true },
+                            products: {
+                                select: {
+                                    id: true,
+                                    name: true,
+                                    price: true,
+                                    isActive: true,
+                                    createdAt: true,
+                                    _count: {
+                                        select: { orderItems: true },
+                                    },
+                                },
                             },
                         },
                     },
@@ -52,10 +56,11 @@ const SellerDashboard: React.FC = () => {
 
             if (profile) {
                 setSellerProfile(profile);
+                const userProducts = profile.user.products;
                 setStats({
-                    totalProducts: profile.products.length,
+                    totalProducts: userProducts.length,
                     totalSales: profile.totalSales,
-                    totalOrders: profile.products.reduce(
+                    totalOrders: userProducts.reduce(
                         (acc: number, p: any) => acc + p._count.orderItems,
                         0
                     ),
@@ -185,8 +190,8 @@ const SellerDashboard: React.FC = () => {
                     <button
                         onClick={() => setActiveTab('overview')}
                         className={`px-6 py-3 border-b-2 font-medium text-sm ${activeTab === 'overview'
-                                ? 'border-[#2563EB] text-[#2563EB]'
-                                : 'border-transparent text-gray-500 hover:text-gray-700'
+                            ? 'border-[#2563EB] text-[#2563EB]'
+                            : 'border-transparent text-gray-500 hover:text-gray-700'
                             }`}
                     >
                         Visão Geral
@@ -194,8 +199,8 @@ const SellerDashboard: React.FC = () => {
                     <button
                         onClick={() => setActiveTab('products')}
                         className={`px-6 py-3 border-b-2 font-medium text-sm ${activeTab === 'products'
-                                ? 'border-[#2563EB] text-[#2563EB]'
-                                : 'border-transparent text-gray-500 hover:text-gray-700'
+                            ? 'border-[#2563EB] text-[#2563EB]'
+                            : 'border-transparent text-gray-500 hover:text-gray-700'
                             }`}
                     >
                         Produtos ({stats.totalProducts})
@@ -203,8 +208,8 @@ const SellerDashboard: React.FC = () => {
                     <button
                         onClick={() => setActiveTab('orders')}
                         className={`px-6 py-3 border-b-2 font-medium text-sm ${activeTab === 'orders'
-                                ? 'border-[#2563EB] text-[#2563EB]'
-                                : 'border-transparent text-gray-500 hover:text-gray-700'
+                            ? 'border-[#2563EB] text-[#2563EB]'
+                            : 'border-transparent text-gray-500 hover:text-gray-700'
                             }`}
                     >
                         Pedidos ({stats.totalOrders})
@@ -246,7 +251,7 @@ const SellerDashboard: React.FC = () => {
                             <div className="text-center py-10">
                                 <p className="text-gray-500">Carregando produtos...</p>
                             </div>
-                        ) : sellerProfile.products.length === 0 ? (
+                        ) : sellerProfile.user.products.length === 0 ? (
                             <div className="text-center py-10">
                                 <p className="text-gray-500">Você ainda não tem produtos cadastrados.</p>
                                 <Link
@@ -269,7 +274,7 @@ const SellerDashboard: React.FC = () => {
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        {sellerProfile.products.map((product: any) => (
+                                        {sellerProfile.user.products.map((product: any) => (
                                             <tr key={product.id} className="border-b border-gray-100 hover:bg-gray-50">
                                                 <td className="py-3 px-4 text-gray-700">{product.name}</td>
                                                 <td className="py-3 px-4 text-gray-700">
@@ -281,8 +286,8 @@ const SellerDashboard: React.FC = () => {
                                                 <td className="py-3 px-4">
                                                     <span
                                                         className={`px-2 py-1 rounded-full text-xs font-medium ${product.isActive
-                                                                ? 'bg-green-100 text-green-700'
-                                                                : 'bg-red-100 text-red-700'
+                                                            ? 'bg-green-100 text-green-700'
+                                                            : 'bg-red-100 text-red-700'
                                                             }`}
                                                     >
                                                         {product.isActive ? 'Ativo' : 'Inativo'}

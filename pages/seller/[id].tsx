@@ -25,15 +25,15 @@ interface SellerProfileData {
         name: string | null;
         email: string | null;
         image: string | null;
+        products: Array<{
+            id: string;
+            name: string;
+            price: number;
+            description: string;
+            isActive: boolean;
+            images: Array<{ url: string; isPrimary: boolean }>;
+        }>;
     };
-    products: Array<{
-        id: string;
-        name: string;
-        price: number;
-        description: string;
-        isActive: boolean;
-        images: Array<{ url: string; isPrimary: boolean }>;
-    }>;
 }
 
 const SellerProfile: React.FC = () => {
@@ -59,17 +59,17 @@ const SellerProfile: React.FC = () => {
                             name: true,
                             email: true,
                             image: true,
-                        },
-                    },
-                    products: {
-                        where: { isActive: true },
-                        include: {
-                            images: {
-                                where: { isPrimary: true },
-                                take: 1,
+                            products: {
+                                where: { isActive: true },
+                                include: {
+                                    images: {
+                                        where: { isPrimary: true },
+                                        take: 1,
+                                    },
+                                },
+                                orderBy: { createdAt: 'desc' },
                             },
                         },
-                        orderBy: { createdAt: 'desc' },
                     },
                 },
             });
@@ -90,15 +90,20 @@ const SellerProfile: React.FC = () => {
                     rating: Number(profile.rating),
                     totalSales: profile.totalSales,
                     createdAt: profile.createdAt,
-                    user: profile.user,
-                    products: profile.products.map((p: any) => ({
-                        id: p.id,
-                        name: p.name,
-                        price: Number(p.price),
-                        description: p.description,
-                        isActive: p.isActive,
-                        images: p.images,
-                    })),
+                    user: {
+                        id: profile.user.id,
+                        name: profile.user.name,
+                        email: profile.user.email,
+                        image: profile.user.image,
+                        products: profile.user.products.map((p: any) => ({
+                            id: p.id,
+                            name: p.name,
+                            price: Number(p.price),
+                            description: p.description,
+                            isActive: p.isActive,
+                            images: p.images,
+                        })),
+                    },
                 });
             } else {
                 setError('Vendedor não encontrado');
@@ -277,11 +282,11 @@ const SellerProfile: React.FC = () => {
                 <div className="bg-white rounded-lg shadow-md overflow-hidden">
                     <div className="p-6 border-b border-gray-100">
                         <h3 className="text-lg font-bold text-[#101B35]">
-                            Produtos ({seller.products.length})
+                            Produtos ({seller.user.products.length})
                         </h3>
                     </div>
 
-                    {seller.products.length === 0 ? (
+                    {seller.user.products.length === 0 ? (
                         <div className="p-12 text-center">
                             <p className="text-gray-500">
                                 Este vendedor não tem produtos disponíveis no momento.
@@ -289,7 +294,7 @@ const SellerProfile: React.FC = () => {
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 p-6">
-                            {seller.products.map((product) => (
+                            {seller.user.products.map((product) => (
                                 <div key={product.id} className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
                                     <div className="h-48 bg-gray-100 relative overflow-hidden">
                                         {product.images.length > 0 ? (
