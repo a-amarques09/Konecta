@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 
+
+
 const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
 const MAX_REQUESTS_PER_WINDOW = 100;
 
@@ -39,7 +41,22 @@ export async function middleware(request: NextRequest) {
             );
         }
     }
+    if (pathname.startsWith('/admin')) {
+        const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
 
+        if (!token || token.role !== 'ADMIN') {
+            return NextResponse.redirect(new URL('/login', request.url));
+        }
+    }
+
+    // Protect seller routes
+    if (pathname.startsWith('/seller') || pathname.startsWith('/products/create')) {
+        const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+
+        if (!token) {
+            return NextResponse.redirect(new URL('/login', request.url));
+        }
+    }
     // Security headers
     const response = NextResponse.next();
 

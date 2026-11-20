@@ -7,10 +7,15 @@ import FeaturedProfessionals from '../components/FeaturedProfessionals';
 import BusinessSection from '../components/BusinessSection';
 import LookingForSomething from '../components/LookingForSomething';
 import Footer from '../components/Footer';
+// This will cause the error because there's no default export
+console.log("Hello, World!");
+
 
 const Home: React.FC = () => {
+
     return (
         <div>
+
             {/* Navbar */}
             <Navbar />
 
@@ -31,7 +36,6 @@ const Home: React.FC = () => {
 
             {/* Looking for Something Section */}
             <LookingForSomething />
-
             {/* Footer */}
             <Footer />
         </div>
@@ -39,4 +43,3 @@ const Home: React.FC = () => {
     );
 };
 export default Home;
-
