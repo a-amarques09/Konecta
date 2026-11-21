@@ -47,8 +47,15 @@ export default async function handler(
         }));
 
         return res.status(200).json(formattedProducts);
-    } catch (error) {
+    } catch (error: any) {
         console.error('Error fetching featured products:', error);
-        return res.status(500).json({ error: 'Internal server error' });
+        const status = error?.status || 500;
+        return res.status(status).json({
+            error: error?.message || 'Internal server error',
+            ...(process.env.NODE_ENV === 'development' && {
+                details: error?.stack,
+                status,
+            }),
+        });
     }
 }

@@ -33,7 +33,10 @@ const FeaturedProducts: React.FC = () => {
         try {
             const response = await fetch('/api/products/featured');
             if (!response.ok) {
-                throw new Error('Failed to fetch products');
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(
+                    `Failed to fetch products (HTTP ${response.status}): ${errorData.error || response.statusText}`
+                );
             }
             const productData = await response.json();
 
@@ -54,7 +57,7 @@ const FeaturedProducts: React.FC = () => {
                     },
                 }))
             );
-        } catch (err) {
+        } catch (err: any) {
             console.error('Error loading featured products:', err);
         } finally {
             setLoading(false);
