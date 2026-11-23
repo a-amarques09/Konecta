@@ -74,8 +74,13 @@ const SellerDashboard: React.FC = () => {
         }
     };
 
+    useEffect(() => {
+        if (!session) {
+            router.push('/login');
+        }
+    }, [session, router]);
+
     if (!session) {
-        router.push('/login');
         return null;
     }
 

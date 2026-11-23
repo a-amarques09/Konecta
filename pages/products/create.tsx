@@ -1,5 +1,5 @@
 import { useSession } from 'next-auth/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
@@ -146,8 +146,13 @@ const ProductCreate: React.FC = () => {
         }
     };
 
+    useEffect(() => {
+        if (!session) {
+            router.push('/login');
+        }
+    }, [session, router]);
+
     if (!session) {
-        router.push('/login');
         return null;
     }
 
