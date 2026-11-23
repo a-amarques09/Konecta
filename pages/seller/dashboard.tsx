@@ -1,7 +1,6 @@
 import { useSession } from 'next-auth/react';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 
 interface SellerStats {
@@ -32,27 +31,9 @@ const SellerDashboard: React.FC = () => {
 
     const loadSellerData = async () => {
         try {
-            const profile = await prisma.sellerProfile.findUnique({
-                where: { userId: session!.user.id },
-                include: {
-                    user: {
-                        select: {
-                            products: {
-                                select: {
-                                    id: true,
-                                    name: true,
-                                    price: true,
-                                    isActive: true,
-                                    createdAt: true,
-                                    _count: {
-                                        select: { orderItems: true },
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-            });
+            const res = await fetch('/api/seller/dashboard');
+            const profile = await res.json();
+            if (!res.ok) throw new Error(profile?.error);
 
             if (profile) {
                 setSellerProfile(profile);

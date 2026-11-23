@@ -1,12 +1,14 @@
 import { NextApiRequest, NextApiResponse } from 'next';
+import service from '../../../service.mjs';
 
 export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse
 ) {
-    // Verify Vercel cron secret
+    // Verify cron secret
     const authHeader = req.headers.authorization;
-    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    const cronSecret = service.input().cronSecret.expose();
+    if (authHeader !== `Bearer ${cronSecret}`) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
 

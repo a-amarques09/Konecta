@@ -2,8 +2,6 @@ import { signIn } from 'next-auth/react';
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import Image from 'next/image';
-import { prisma } from '@/lib/prisma';
-import bcrypt from 'bcryptjs';
 
 interface RegisterFormData {
     name: string;
@@ -51,27 +49,23 @@ const Register: React.FC = () => {
         setLoading(true);
 
         try {
-            const existingUser = await prisma.user.findUnique({
-                where: { email: formData.email },
+            const res = await fetch('/api/auth/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: formData.name,
+                    email: formData.email,
+                    password: formData.password,
+                    phone: formData.phone,
+                }),
             });
+            const data = await res.json();
 
-            if (existingUser) {
-                setError('Este email já está cadastrado');
+            if (!res.ok) {
+                setError(data?.error || 'Erro ao criar conta. Tente novamente.');
                 setLoading(false);
                 return;
             }
-
-            const hashedPassword = await bcrypt.hash(formData.password, 12);
-
-            const user = await prisma.user.create({
-                data: {
-                    name: formData.name,
-                    email: formData.email,
-                    password: hashedPassword,
-                    phone: formData.phone || null,
-                    role: 'CUSTOMER',
-                },
-            });
 
             setSuccess('Conta criada com sucesso! Faça login.');
 

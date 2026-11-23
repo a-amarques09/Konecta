@@ -1,7 +1,6 @@
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
-import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -50,61 +49,12 @@ const SellerProfile: React.FC = () => {
 
     const loadSellerProfile = async (id: string) => {
         try {
-            const profile = await prisma.sellerProfile.findUnique({
-                where: { id },
-                include: {
-                    user: {
-                        select: {
-                            id: true,
-                            name: true,
-                            email: true,
-                            image: true,
-                            products: {
-                                where: { isActive: true },
-                                include: {
-                                    images: {
-                                        where: { isPrimary: true },
-                                        take: 1,
-                                    },
-                                },
-                                orderBy: { createdAt: 'desc' },
-                            },
-                        },
-                    },
-                },
-            });
+            const res = await fetch(`/api/seller/${id}`);
+            const profile = await res.json();
+            if (!res.ok) throw new Error(profile?.error);
 
             if (profile) {
-                setSeller({
-                    id: profile.id,
-                    businessName: profile.businessName,
-                    businessType: profile.businessType,
-                    description: profile.description,
-                    address: profile.address,
-                    city: profile.city,
-                    country: profile.country,
-                    phone: profile.phone,
-                    email: profile.email,
-                    website: profile.website,
-                    isVerified: profile.isVerified,
-                    rating: Number(profile.rating),
-                    totalSales: profile.totalSales,
-                    createdAt: profile.createdAt,
-                    user: {
-                        id: profile.user.id,
-                        name: profile.user.name,
-                        email: profile.user.email,
-                        image: profile.user.image,
-                        products: profile.user.products.map((p: any) => ({
-                            id: p.id,
-                            name: p.name,
-                            price: Number(p.price),
-                            description: p.description,
-                            isActive: p.isActive,
-                            images: p.images,
-                        })),
-                    },
-                });
+                setSeller(profile);
             } else {
                 setError('Vendedor não encontrado');
             }

@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { prisma } from '@/lib/prisma';
+import { getDb } from '@/lib/prisma';
 
 export default async function handler(
     req: NextApiRequest,
@@ -10,25 +10,15 @@ export default async function handler(
     }
 
     try {
-        const products = await prisma.product.findMany({
-            where: {
-                isActive: true,
-                isFeatured: true,
-            },
-            include: {
-                seller: {
-                    include: {
-                        sellerProfile: true,
-                    },
-                },
-                images: {
-                    where: { isPrimary: true },
-                    take: 1,
-                },
-            },
-            orderBy: { createdAt: 'desc' },
-            take: 8,
-        });
+        const db = getDb();
+
+        const products = await db.orm.public.Product
+            .where({ isActive: true, isFeatured: true })
+            .include('seller', (s) => s.include('sellerProfile'))
+            .include('images', (img) => img.where({ isPrimary: true }).limit(1))
+            .orderBy((p) => p.createdAt.desc())
+            .limit(8)
+            .all();
 
         const formattedProducts = products.map((p: any) => ({
             id: p.id,
