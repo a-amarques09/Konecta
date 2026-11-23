@@ -2,7 +2,6 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { prisma } from '@/lib/prisma';
 import Image from 'next/image';
 
 interface ProductDetailData {
@@ -68,28 +67,11 @@ const ProductDetail: React.FC = () => {
 
     const loadProduct = async (slug: string) => {
         try {
-            const productData = await prisma.product.findUnique({
-                where: { slug },
-                include: {
-                    seller: {
-                        include: {
-                            sellerProfile: true,
-                        },
-                    },
-                    category: true,
-                    images: {
-                        orderBy: { isPrimary: 'desc' },
-                    },
-                },
-            });
+            const res = await fetch(`/api/products/${slug}`);
+            const productData = await res.json();
+            if (!res.ok) throw new Error(productData?.error);
 
             if (productData) {
-                // Increment view count
-                await prisma.product.update({
-                    where: { id: productData.id },
-                    data: { views: { increment: 1 } },
-                });
-
                 setProduct({
                     id: productData.id,
                     name: productData.name,

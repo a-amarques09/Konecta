@@ -1,7 +1,6 @@
 import { useSession } from 'next-auth/react';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { prisma } from '@/lib/prisma';
 import Image from 'next/image';
 
 interface ProductCardData {
@@ -64,11 +63,10 @@ const ProductsPage: React.FC = () => {
 
     const loadCategories = async () => {
         try {
-            const cats = await prisma.category.findMany({
-                select: { id: true, name: true },
-                orderBy: { name: 'asc' },
-            });
-            setCategories(cats);
+            const res = await fetch('/api/categories');
+            const cats = await res.json();
+            if (!res.ok) throw new Error(cats?.error);
+            setCategories(cats.map((c: any) => ({ id: c.id, name: c.name })));
         } catch (err) {
             console.error('Error loading categories:', err);
         }
@@ -78,81 +76,21 @@ const ProductsPage: React.FC = () => {
         try {
             setLoading(true);
 
-            const where: any = {
-                isActive: true,
-            };
+            const params = new URLSearchParams();
+            if (filter.search) params.set('search', filter.search);
+            if (filter.category) params.set('category', filter.category);
+            if (filter.condition) params.set('condition', filter.condition);
+            if (filter.minPrice) params.set('minPrice', filter.minPrice);
+            if (filter.maxPrice) params.set('maxPrice', filter.maxPrice);
+            if (filter.city) params.set('city', filter.city);
+            params.set('page', String(currentPage));
 
-            if (filter.search) {
-                where.OR = [
-                    { name: { contains: filter.search, mode: 'insensitive' } },
-                    { description: { contains: filter.search, mode: 'insensitive' } },
-                ];
-            }
+            const res = await fetch(`/api/products?${params.toString()}`);
+            const data = await res.json();
+            if (!res.ok) throw new Error(data?.error);
 
-            if (filter.category) {
-                where.categoryId = filter.category;
-            }
-
-            if (filter.condition) {
-                where.condition = filter.condition;
-            }
-
-            if (filter.minPrice) {
-                where.price = { ...where.price, gte: parseFloat(filter.minPrice) };
-            }
-
-            if (filter.maxPrice) {
-                where.price = { ...where.price, lte: parseFloat(filter.maxPrice) };
-            }
-
-            if (filter.city) {
-                where.city = { contains: filter.city, mode: 'insensitive' };
-            }
-
-            const [productData, totalCount] = await Promise.all([
-                prisma.product.findMany({
-                    where,
-                    include: {
-                        seller: {
-                            include: {
-                                sellerProfile: true,
-                            },
-                        },
-                        category: true,
-                        images: {
-                            where: { isPrimary: true },
-                            take: 1,
-                        },
-                    },
-                    orderBy: { createdAt: 'desc' },
-                    skip: (currentPage - 1) * ITEMS_PER_PAGE,
-                    take: ITEMS_PER_PAGE,
-                }),
-                prisma.product.count({ where }),
-            ]);
-
-            setProducts(
-                productData.map((p: any) => ({
-                    id: p.id,
-                    name: p.name,
-                    slug: p.slug,
-                    price: Number(p.price),
-                    currency: p.currency,
-                    condition: p.condition,
-                    city: p.city,
-                    country: p.country,
-                    isActive: p.isActive,
-                    images: p.images,
-                    seller: {
-                        id: p.seller.id,
-                        name: p.seller.name,
-                        sellerProfile: p.seller.sellerProfile,
-                    },
-                    category: p.category,
-                }))
-            );
-
-            setTotalPages(Math.ceil(totalCount / ITEMS_PER_PAGE));
+            setProducts(data.products);
+            setTotalPages(data.totalPages);
         } catch (err) {
             setError('Erro ao carregar produtos');
             console.error(err);
