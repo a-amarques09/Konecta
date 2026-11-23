@@ -1,7 +1,6 @@
 import { useSession } from 'next-auth/react';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
-import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 
 interface ProductFormData {
@@ -62,11 +61,10 @@ const ProductCreate: React.FC = () => {
 
     const loadCategories = async () => {
         try {
-            const cats = await prisma.category.findMany({
-                select: { id: true, name: true },
-                orderBy: { name: 'asc' },
-            });
-            setCategories(cats);
+            const res = await fetch('/api/categories');
+            const cats = await res.json();
+            if (!res.ok) throw new Error(cats?.error);
+            setCategories(cats.map((c: any) => ({ id: c.id, name: c.name })));
         } catch (err) {
             console.error('Error loading categories:', err);
         }
@@ -79,15 +77,6 @@ const ProductCreate: React.FC = () => {
 
         if (!session?.user?.id) {
             setError('Você precisa estar logado para anunciar produtos');
-            return;
-        }
-
-        const sellerProfile = await prisma.sellerProfile.findUnique({
-            where: { userId: session.user.id },
-        });
-
-        if (!sellerProfile) {
-            setError('Você precisa se cadastrar como vendedor primeiro');
             return;
         }
 
@@ -104,39 +93,20 @@ const ProductCreate: React.FC = () => {
         setLoading(true);
 
         try {
-            const slug = formData.name
-                .toLowerCase()
-                .replace(/[^a-z0-9]+/g, '-')
-                .replace(/-+$/, '');
-
-            const product = await prisma.product.create({
-                data: {
-                    name: formData.name,
-                    slug,
-                    description: formData.description,
-                    price: parseFloat(formData.price),
-                    currency: 'KZ',
-                    stock: parseInt(formData.stock) || 0,
-                    condition: formData.condition as any,
-                    location: formData.location,
-                    city: formData.city,
-                    country: 'Angola',
-                    sellerId: session.user.id,
-                    categoryId: formData.categoryId,
-                    isActive: true,
-                    images: {
-                        create: images.map((file, index) => ({
-                            url: `/uploads/${file.name}`,
-                            alt: formData.name,
-                            isPrimary: index === 0,
-                        })),
-                    },
-                },
+            const res = await fetch('/api/products/create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    ...formData,
+                    images: images.map((file) => ({ name: file.name })),
+                }),
             });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data?.error);
 
             setSuccess('Produto criado com sucesso!');
             setTimeout(() => {
-                router.push(`/products/${product.slug}`);
+                router.push(`/products/${data.slug}`);
             }, 1500);
         } catch (err) {
             setError('Erro ao criar produto. Tente novamente.');

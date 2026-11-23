@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { getToken } from 'next-auth/jwt';
+import service from './service.mjs';
 
 
 
@@ -26,6 +27,10 @@ function rateLimit(identifier: string): boolean {
     return true;
 }
 
+function nextAuthSecret(): string {
+    return service.input().nextAuthSecret.expose();
+}
+
 export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
@@ -42,7 +47,7 @@ export async function middleware(request: NextRequest) {
         }
     }
     if (pathname.startsWith('/admin')) {
-        const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+        const token = await getToken({ req: request, secret: nextAuthSecret() });
 
         if (!token || token.role !== 'ADMIN') {
             return NextResponse.redirect(new URL('/login', request.url));
@@ -51,7 +56,7 @@ export async function middleware(request: NextRequest) {
 
     // Protect seller routes
     if (pathname.startsWith('/seller') || pathname.startsWith('/products/create')) {
-        const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+        const token = await getToken({ req: request, secret: nextAuthSecret() });
 
         if (!token) {
             return NextResponse.redirect(new URL('/login', request.url));
@@ -71,7 +76,7 @@ export async function middleware(request: NextRequest) {
 
     // Protect admin routes
     if (pathname.startsWith('/admin')) {
-        const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+        const token = await getToken({ req: request, secret: nextAuthSecret() });
 
         if (!token || token.role !== 'ADMIN') {
             return NextResponse.redirect(new URL('/login', request.url));
@@ -80,7 +85,7 @@ export async function middleware(request: NextRequest) {
 
     // Protect seller routes
     if (pathname.startsWith('/seller') || pathname.startsWith('/products/create')) {
-        const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+        const token = await getToken({ req: request, secret: nextAuthSecret() });
 
         if (!token) {
             return NextResponse.redirect(new URL('/login', request.url));
@@ -91,5 +96,6 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
+    runtime: 'nodejs',
     matcher: ['/api/:path*', '/admin/:path*', '/seller/:path*', '/products/create'],
 };

@@ -2,7 +2,6 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/router';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { prisma } from '@/lib/prisma';
 import Image from 'next/image';
 
 interface CategoryDetailData {
@@ -60,34 +59,9 @@ const CategoryDetail: React.FC = () => {
 
     const loadCategory = async (slug: string) => {
         try {
-            const cat = await prisma.category.findUnique({
-                where: { slug },
-                include: {
-                    products: {
-                        where: { isActive: true },
-                        include: {
-                            images: {
-                                where: { isPrimary: true },
-                                take: 1,
-                            },
-                            seller: {
-                                include: {
-                                    sellerProfile: true,
-                                },
-                            },
-                        },
-                        orderBy: { createdAt: 'desc' },
-                    },
-                    children: {
-                        include: {
-                            _count: {
-                                select: { products: true },
-                            },
-                        },
-                    },
-                    parent: true,
-                },
-            });
+            const res = await fetch(`/api/categories/${slug}`);
+            const cat = await res.json();
+            if (!res.ok) throw new Error(cat?.error);
 
             if (cat) {
                 setCategory({
@@ -97,22 +71,7 @@ const CategoryDetail: React.FC = () => {
                     description: cat.description,
                     image: cat.image,
                     parentId: cat.parentId,
-                    products: cat.products.map((p: any) => ({
-                        id: p.id,
-                        name: p.name,
-                        slug: p.slug,
-                        price: Number(p.price),
-                        description: p.description,
-                        location: p.location,
-                        city: p.city,
-                        isActive: p.isActive,
-                        images: p.images,
-                        seller: {
-                            id: p.seller.id,
-                            name: p.seller.name,
-                            sellerProfile: p.seller.sellerProfile,
-                        },
-                    })),
+                    products: cat.products,
                     children: cat.children,
                     parent: cat.parent,
                 });

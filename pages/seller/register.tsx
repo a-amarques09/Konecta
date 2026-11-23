@@ -1,9 +1,6 @@
 import { useSession } from 'next-auth/react';
 import { useState } from 'react';
 import { useRouter } from 'next/router';
-import { prisma } from '@/lib/prisma';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
 
 interface SellerRegisterFormData {
     businessName: string;
@@ -53,36 +50,18 @@ const SellerRegister: React.FC = () => {
         setLoading(true);
 
         try {
-            const existingSeller = await prisma.sellerProfile.findUnique({
-                where: { userId: session.user.id },
+            const res = await fetch('/api/seller/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(formData),
             });
+            const data = await res.json();
 
-            if (existingSeller) {
-                setError('Você já possui um perfil de vendedor cadastrado');
+            if (!res.ok) {
+                setError(data?.error || 'Erro ao criar perfil de vendedor. Tente novamente.');
                 setLoading(false);
                 return;
             }
-
-            await prisma.sellerProfile.create({
-                data: {
-                    userId: session.user.id,
-                    businessName: formData.businessName,
-                    businessType: formData.businessType,
-                    description: formData.description,
-                    address: formData.address,
-                    city: formData.city,
-                    country: 'Angola',
-                    phone: formData.phone,
-                    email: formData.email,
-                    website: formData.website || null,
-                    isVerified: false,
-                },
-            });
-
-            await prisma.user.update({
-                where: { id: session.user.id },
-                data: { role: 'SELLER' },
-            });
 
             setSuccess('Perfil de vendedor criado com sucesso! Aguarde verificação.');
 

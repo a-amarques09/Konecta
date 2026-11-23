@@ -1,7 +1,6 @@
 import { useSession } from 'next-auth/react';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { prisma } from '@/lib/prisma';
 import Image from 'next/image';
 
 interface CategoryData {
@@ -29,22 +28,9 @@ const CategoriesPage: React.FC = () => {
 
     const loadCategories = async () => {
         try {
-            const cats = await prisma.category.findMany({
-                where: { parentId: null },
-                include: {
-                    _count: {
-                        select: { products: true },
-                    },
-                    children: {
-                        include: {
-                            _count: {
-                                select: { products: true },
-                            },
-                        },
-                    },
-                },
-                orderBy: { name: 'asc' },
-            });
+            const res = await fetch('/api/categories');
+            const cats = await res.json();
+            if (!res.ok) throw new Error(cats?.error);
 
             setCategories(cats);
         } catch (err) {
