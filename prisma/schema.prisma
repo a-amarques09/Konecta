@@ -1,220 +1,220 @@
 generator client {
-  provider = "prisma-client-js"
+    provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+    provider = "sqlite"
+    url      = env("DATABASE_URL")
 }
 
 model User {
-  id            String    @id @default(uuid())
-  name          String?
-  email         String    @unique
-  emailVerified DateTime?
-  image         String?
-  password      String?
-  role          UserRole  @default(CUSTOMER)
-  phone         String?
-  address       String?
-  city          String?
-  country       String    @default("Angola")
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+    id            String    @id @default(uuid())
+    name          String?
+    email         String    @unique
+    emailVerified DateTime?
+    image         String?
+    password      String?
+    role          UserRole  @default(CUSTOMER)
+    phone         String?
+    address       String?
+    city          String?
+    country       String    @default("Angola")
+    createdAt     DateTime  @default(now())
+    updatedAt     DateTime  @updatedAt
 
-  accounts      Account[]
-  sessions      Session[]
-  products      Product[]
-  sellerProfile SellerProfile?
-  orders        Order[]
+    accounts      Account[]
+    sessions      Session[]
+    products      Product[]
+    sellerProfile SellerProfile?
+    orders        Order[]
 
-  @@index([email])
+    @@index([email])
 }
 
 model Account {
-  id                String  @id @default(uuid())
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String?
-  access_token      String?
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String?
-  session_state     String?
+    id                String  @id @default(uuid())
+    userId            String
+    type              String
+    provider          String
+    providerAccountId String
+    refresh_token     String?
+    access_token      String?
+    expires_at        Int?
+    token_type        String?
+    scope             String?
+    id_token          String?
+    session_state     String?
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([provider, providerAccountId])
+    @@unique([provider, providerAccountId])
 }
 
 model Session {
-  id           String   @id @default(uuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    id           String   @id @default(uuid())
+    sessionToken String   @unique
+    userId       String
+    expires      DateTime
+    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([userId])
+    @@index([userId])
 }
 
 model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
+    identifier String
+    token      String   @unique
+    expires    DateTime
 
-  @@unique([identifier, token])
+    @@unique([identifier, token])
 }
 
 model SellerProfile {
-  id            String     @id @default(uuid())
-  userId        String     @unique
-  businessName  String
-  businessType  String
-  description   String?
-  address       String?
-  city          String?
-  country       String     @default("Angola")
-  phone         String?
-  email         String?
-  website       String?
-  isVerified    Boolean    @default(false)
-  verificationDocument String?
-  rating        Decimal    @default(0.0)
-  totalSales    Int        @default(0)
-  createdAt     DateTime   @default(now())
-  updatedAt     DateTime   @updatedAt
+    id                   String   @id @default(uuid())
+    userId               String   @unique
+    businessName         String
+    businessType         String
+    description          String?
+    address              String?
+    city                 String?
+    country              String   @default("Angola")
+    phone                String?
+    email                String?
+    website              String?
+    isVerified           Boolean  @default(false)
+    verificationDocument String?
+    rating               Decimal  @default(0.0)
+    totalSales           Int      @default(0)
+    createdAt            DateTime @default(now())
+    updatedAt            DateTime @updatedAt
 
-  user    User @relation(fields: [userId], references: [id], onDelete: Cascade)
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@index([userId])
-  @@index([businessName])
+    @@index([userId])
+    @@index([businessName])
 }
 
 model Category {
-  id          String   @id @default(uuid())
-  name        String
-  slug        String   @unique
-  description String?
-  image       String?
-  parentId    String?
-  parent      Category? @relation("CategoryChildren", fields: [parentId], references: [id])
-  children    Category[] @relation("CategoryChildren")
-  products    Product[]
+    id          String     @id @default(uuid())
+    name        String
+    slug        String     @unique
+    description String?
+    image       String?
+    parentId    String?
+    parent      Category?  @relation("CategoryChildren", fields: [parentId], references: [id])
+    children    Category[] @relation("CategoryChildren")
+    products    Product[]
 
-  @@index([slug])
-  @@index([parentId])
+    @@index([slug])
+    @@index([parentId])
 }
 
 model Product {
-  id          String     @id @default(uuid())
-  name        String
-  slug        String     @unique
-  description String
-  price       Decimal
-  currency    String     @default("KZ")
-  stock       Int        @default(0)
-  condition   ProductCondition @default(USED)
-  location    String
-  city        String
-  country     String     @default("Angola")
-  isActive    Boolean    @default(true)
-  isFeatured  Boolean    @default(false)
-  views       Int        @default(0)
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+    id          String           @id @default(uuid())
+    name        String
+    slug        String           @unique
+    description String
+    price       Decimal
+    currency    String           @default("KZ")
+    stock       Int              @default(0)
+    condition   ProductCondition @default(USED)
+    location    String
+    city        String
+    country     String           @default("Angola")
+    isActive    Boolean          @default(true)
+    isFeatured  Boolean          @default(false)
+    views       Int              @default(0)
+    createdAt   DateTime         @default(now())
+    updatedAt   DateTime         @updatedAt
 
-  sellerId    String
-  categoryId  String
+    sellerId   String
+    categoryId String
 
-  seller      User       @relation(fields: [sellerId], references: [id])
-  category    Category   @relation(fields: [categoryId], references: [id])
-  images      ProductImage[]
-  orderItems  OrderItem[]
+    seller     User           @relation(fields: [sellerId], references: [id])
+    category   Category       @relation(fields: [categoryId], references: [id])
+    images     ProductImage[]
+    orderItems OrderItem[]
 
-  @@index([sellerId])
-  @@index([categoryId])
-  @@index([slug])
-  @@index([isActive])
-  @@index([isFeatured])
-  @@index([price])
+    @@index([sellerId])
+    @@index([categoryId])
+    @@index([slug])
+    @@index([isActive])
+    @@index([isFeatured])
+    @@index([price])
 }
 
 model ProductImage {
-  id        String   @id @default(uuid())
-  url       String
-  alt       String?
-  isPrimary Boolean  @default(false)
-  productId String
+    id        String  @id @default(uuid())
+    url       String
+    alt       String?
+    isPrimary Boolean @default(false)
+    productId String
 
-  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+    product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
-  @@index([productId])
+    @@index([productId])
 }
 
 model Order {
-  id          String   @id @default(uuid())
-  orderNumber String   @unique
-  status      OrderStatus @default(PENDING)
-  total       Decimal
-  currency    String   @default("KZ")
-  customerId  String
-  shippingAddress String
-  shippingCity String
-  shippingCountry String @default("Angola")
-  paymentStatus PaymentStatus @default(PENDING)
-  paymentMethod String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime   @updatedAt
+    id              String        @id @default(uuid())
+    orderNumber     String        @unique
+    status          OrderStatus   @default(PENDING)
+    total           Decimal
+    currency        String        @default("KZ")
+    customerId      String
+    shippingAddress String
+    shippingCity    String
+    shippingCountry String        @default("Angola")
+    paymentStatus   PaymentStatus @default(PENDING)
+    paymentMethod   String?
+    createdAt       DateTime      @default(now())
+    updatedAt       DateTime      @updatedAt
 
-  customer    User     @relation(fields: [customerId], references: [id])
-  items       OrderItem[]
+    customer User        @relation(fields: [customerId], references: [id])
+    items    OrderItem[]
 
-  @@index([customerId])
-  @@index([status])
-  @@index([orderNumber])
+    @@index([customerId])
+    @@index([status])
+    @@index([orderNumber])
 }
 
 model OrderItem {
-  id        String   @id @default(uuid())
-  quantity  Int
-  price     Decimal
-  orderId   String
-  productId String
+    id        String  @id @default(uuid())
+    quantity  Int
+    price     Decimal
+    orderId   String
+    productId String
 
-  order  Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  product Product @relation(fields: [productId], references: [id])
+    order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+    product Product @relation(fields: [productId], references: [id])
 
-  @@index([orderId])
-  @@index([productId])
+    @@index([orderId])
+    @@index([productId])
 }
 
 enum UserRole {
-  CUSTOMER
-  SELLER
-  ADMIN
+    CUSTOMER
+    SELLER
+    ADMIN
 }
 
 enum ProductCondition {
-  NEW
-  USED
-  REFURBISHED
+    NEW
+    USED
+    REFURBISHED
 }
 
 enum OrderStatus {
-  PENDING
-  CONFIRMED
-  SHIPPED
-  DELIVERED
-  CANCELLED
-  REFUNDED
+    PENDING
+    CONFIRMED
+    SHIPPED
+    DELIVERED
+    CANCELLED
+    REFUNDED
 }
 
 enum PaymentStatus {
-  PENDING
-  PAID
-  FAILED
-  REFUNDED
+    PENDING
+    PAID
+    FAILED
+    REFUNDED
 }
