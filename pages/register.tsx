@@ -94,8 +94,14 @@ const Register: React.FC = () => {
                         Criar Conta
                     </h1>
                     <p className="text-gray-600 mt-2">
-                        Junte-se à KONECTA e comece a comprar e vender.
+                        Comece a comprar e vender.
                     </p>
+                    <a
+                        href="/"
+                        className="text-[#2563EB] text-sm font-medium hover:underline mt-2 inline-block"
+                    >
+                        Voltar ao início
+                    </a>
                 </div>
 
                 {error && (

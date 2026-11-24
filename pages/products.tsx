@@ -299,10 +299,10 @@ const ProductsPage: React.FC = () => {
                             </svg>
                         </div>
                         <h3 className="text-xl font-bold text-[#101B35] mb-2">
-                            Nenhum produto encontrado
+                            Sem nada de momento
                         </h3>
                         <p className="text-gray-600 mb-6">
-                            Tente ajustar seus filtros de busca.
+                            Não há produtos disponíveis no momento.
                         </p>
                         <button
                             onClick={clearFilters}
@@ -378,8 +378,8 @@ const ProductsPage: React.FC = () => {
                             onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
                             disabled={currentPage === 1}
                             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${currentPage === 1
-                                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                                    : 'bg-[#2563EB] text-white hover:bg-[#101B35]'
+                                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                : 'bg-[#2563EB] text-white hover:bg-[#101B35]'
                                 }`}
                         >
                             Anterior
@@ -391,8 +391,8 @@ const ProductsPage: React.FC = () => {
                             onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
                             disabled={currentPage === totalPages}
                             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${currentPage === totalPages
-                                    ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                                    : 'bg-[#2563EB] text-white hover:bg-[#101B35]'
+                                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                : 'bg-[#2563EB] text-white hover:bg-[#101B35]'
                                 }`}
                         >
                             Próxima

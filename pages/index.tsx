@@ -7,6 +7,7 @@ import FeaturedProfessionals from '../components/FeaturedProfessionals';
 import BusinessSection from '../components/BusinessSection';
 import LookingForSomething from '../components/LookingForSomething';
 import Footer from '../components/Footer';
+import BottomNavigation from '../components/BottomNavigation';
 // This will cause the error because there's no default export
 console.log("Hello, World!");
 
@@ -14,7 +15,7 @@ console.log("Hello, World!");
 const Home: React.FC = () => {
 
     return (
-        <div>
+        <div className="min-h-screen pb-20 md:pb-0">
 
             {/* Navbar */}
             <Navbar />
@@ -38,6 +39,9 @@ const Home: React.FC = () => {
             <LookingForSomething />
             {/* Footer */}
             <Footer />
+
+            {/* Bottom Navigation - Mobile Only */}
+            <BottomNavigation />
         </div>
 
     );

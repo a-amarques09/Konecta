@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getDb } from '@/lib/prisma';
+import prisma from '@/lib/prisma';
 
 export default async function handler(
     req: NextApiRequest,
@@ -10,14 +10,22 @@ export default async function handler(
     }
 
     try {
-        const db = getDb();
-
-        const cats = await db.orm.public.Category
-            .where((c) => c.parentId.isNull())
-            .include('children', (ch) => ch.include('products', (p) => p.count()))
-            .include('products', (p) => p.count())
-            .orderBy((c) => c.name.asc())
-            .all();
+        const cats = await prisma.category.findMany({
+            where: { parentId: null },
+            include: {
+                children: {
+                    include: {
+                        products: {
+                            select: { _count: true },
+                        },
+                    },
+                },
+                products: {
+                    select: { _count: true },
+                },
+            },
+            orderBy: { name: 'asc' },
+        });
 
         const formatted = cats.map((c: any) => ({
             id: c.id,
@@ -26,7 +34,7 @@ export default async function handler(
             description: c.description,
             image: c.image,
             parentId: c.parentId,
-            _count: { products: c.products },
+            _count: { products: c.products?._count || 0 },
             children: (c.children ?? []).map((ch: any) => ({
                 id: ch.id,
                 name: ch.name,
@@ -34,7 +42,7 @@ export default async function handler(
                 description: ch.description,
                 image: ch.image,
                 parentId: ch.parentId,
-                _count: { products: ch.products },
+                _count: { products: ch.products?._count || 0 },
             })),
         }));
 

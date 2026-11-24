@@ -1,6 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getDb } from '@/lib/prisma';
-import { or } from '@prisma/orm-postgres/orm-client';
+import prisma from '@/lib/prisma';
 
 const ITEMS_PER_PAGE = 12;
 
@@ -16,48 +15,56 @@ export default async function handler(
     const page = Math.max(parseInt(String(req.query.page ?? '1'), 10) || 1, 1);
 
     try {
-        const db = getDb();
-
-        let col = db.orm.public.Product.where({ isActive: true });
+        const where: any = { isActive: true };
 
         if (search) {
-            col = col.where((p) => or(
-                p.name.ilike(`%${search}%`),
-                p.description.ilike(`%${search}%`),
-            ));
+            where.OR = [
+                { name: { contains: search, mode: 'insensitive' } },
+                { description: { contains: search, mode: 'insensitive' } },
+            ];
         }
         if (category) {
-            col = col.where({ categoryId: category });
+            where.categoryId = category;
         }
         if (condition) {
-            col = col.where({ condition: condition as any });
+            where.condition = condition;
         }
         if (minPrice) {
-            col = col.where((p) => p.price.gte(String(parseFloat(minPrice))));
+            where.price = { ...where.price, gte: parseFloat(minPrice) };
         }
         if (maxPrice) {
-            col = col.where((p) => p.price.lte(String(parseFloat(maxPrice))));
+            where.price = { ...where.price, lte: parseFloat(maxPrice) };
         }
         if (city) {
-            col = col.where((p) => p.city.ilike(`%${city}%`));
+            where.city = { contains: city, mode: 'insensitive' };
         }
 
-        const [productData, totalCount] = await Promise.all([
-            col
-                .include('seller', (s) => s.include('sellerProfile'))
-                .include('category')
-                .include('images', (img) => img.where({ isPrimary: true }).limit(1))
-                .orderBy((p) => p.createdAt.desc())
-                .offset((page - 1) * ITEMS_PER_PAGE)
-                .limit(ITEMS_PER_PAGE)
-                .all(),
-            col.aggregate((a) => ({ total: a.count() })),
+        const [products, totalCount] = await Promise.all([
+            prisma.product.findMany({
+                where,
+                include: {
+                    seller: {
+                        include: {
+                            sellerProfile: true,
+                        },
+                    },
+                    category: true,
+                    images: {
+                        where: { isPrimary: true },
+                        take: 1,
+                    },
+                },
+                orderBy: { createdAt: 'desc' },
+                skip: (page - 1) * ITEMS_PER_PAGE,
+                take: ITEMS_PER_PAGE,
+            }),
+            prisma.product.count({ where }),
         ]);
 
-        const totalPages = Math.ceil(totalCount.total / ITEMS_PER_PAGE);
+        const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);
 
         return res.status(200).json({
-            products: productData.map((p: any) => ({
+            products: products.map((p: any) => ({
                 id: p.id,
                 name: p.name,
                 slug: p.slug,

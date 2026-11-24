@@ -66,15 +66,15 @@ const FeaturedProducts: React.FC = () => {
 
     if (loading) {
         return (
-            <section className="bg-[#F5F7FA] py-16 px-6">
-                <h2 className="text-3xl font-bold text-[#101B35] text-center mb-8">
+            <section className="bg-[#F5F7FA] py-12 px-4">
+                <h2 className="text-2xl sm:text-3xl font-bold text-[#101B35] text-center mb-6">
                     Produtos em Destaque
                 </h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                     {[1, 2, 3, 4].map((i) => (
-                        <div key={i} className="bg-white rounded-lg shadow-md border border-gray-100 animate-pulse">
-                            <div className="h-40 bg-gray-200 rounded-t-lg"></div>
-                            <div className="p-4">
+                        <div key={i} className="bg-white rounded-lg shadow-sm border border-gray-100 animate-pulse">
+                            <div className="h-32 sm:h-40 bg-gray-200 rounded-t-lg"></div>
+                            <div className="p-3 sm:p-4">
                                 <h3 className="h-6 bg-gray-200 rounded mb-2"></h3>
                                 <p className="h-4 bg-gray-200 rounded mb-2 w-3/4"></p>
                                 <p className="h-4 bg-gray-200 rounded w-1/2"></p>
@@ -88,11 +88,11 @@ const FeaturedProducts: React.FC = () => {
 
     if (products.length === 0) {
         return (
-            <section className="bg-[#F5F7FA] py-16 px-6">
-                <h2 className="text-3xl font-bold text-[#101B35] text-center mb-8">
+            <section className="bg-[#F5F7FA] py-12 px-4">
+                <h2 className="text-2xl sm:text-3xl font-bold text-[#101B35] text-center mb-6">
                     Produtos em Destaque
                 </h2>
-                <div className="text-center py-10">
+                <div className="text-center py-8">
                     <p className="text-gray-500">Nenhum produto em destaque no momento.</p>
                 </div>
             </section>
@@ -100,17 +100,17 @@ const FeaturedProducts: React.FC = () => {
     }
 
     return (
-        <section className="bg-[#F5F7FA] py-16 px-6">
-            <h2 className="text-3xl font-bold text-[#101B35] text-center mb-8">
+        <section className="bg-[#F5F7FA] py-12 px-4">
+            <h2 className="text-2xl sm:text-3xl font-bold text-[#101B35] text-center mb-6">
                 Produtos em Destaque
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {products.map((product) => (
                     <div
                         key={product.id}
                         className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow group"
                     >
-                        <div className="h-48 bg-gray-100 relative overflow-hidden">
+                        <div className="h-32 sm:h-40 bg-gray-100 relative overflow-hidden">
                             {product.images.length > 0 ? (
                                 <Image
                                     src={product.images[0].url}
@@ -136,7 +136,7 @@ const FeaturedProducts: React.FC = () => {
                                 </span>
                             )}
                         </div>
-                        <div className="p-4">
+                        <div className="p-3 sm:p-4">
                             <Link
                                 href={`/products/${product.slug}`}
                                 className="block"

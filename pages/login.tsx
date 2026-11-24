@@ -65,6 +65,12 @@ const Login: React.FC = () => {
                     <p className="text-gray-600 mt-2">
                         Bem-vindo de volta. Faça login na sua conta.
                     </p>
+                    <a
+                        href="/"
+                        className="text-[#2563EB] text-sm font-medium hover:underline mt-2 inline-block"
+                    >
+                        Voltar ao início
+                    </a>
                 </div>
 
                 {error && (

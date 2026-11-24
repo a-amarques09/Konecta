@@ -9,39 +9,39 @@ const Navbar: React.FC = () => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     return (
-        <nav className="bg-[#101B35] text-white px-6 py-4 flex justify-between items-center">
+        <nav className="bg-[#101B35] text-white px-4 py-3 flex justify-between items-center">
             {/* Logo */}
-            <Link href="/" className="text-xl font-bold">
+            <Link href="/" className="text-lg font-bold">
                 KONECTA
             </Link>
 
             {/* Navigation Links */}
-            <ul className="hidden md:flex space-x-6">
+            <ul className="hidden md:flex space-x-4">
                 <li>
-                    <Link href="/" className="hover:text-[#2563EB]">
+                    <Link href="/" className="text-sm hover:text-[#2563EB]">
                         Início
                     </Link>
                 </li>
                 <li>
-                    <Link href="/products" className="hover:text-[#2563EB]">
+                    <Link href="/products" className="text-sm hover:text-[#2563EB]">
                         Explorar
                     </Link>
                 </li>
                 <li>
-                    <Link href="/categories" className="hover:text-[#2563EB]">
+                    <Link href="/categories" className="text-sm hover:text-[#2563EB]">
                         Categorias
                     </Link>
                 </li>
                 {session?.user?.role === 'SELLER' || session?.user?.role === 'ADMIN' ? (
                     <li>
-                        <Link href="/seller/dashboard" className="hover:text-[#2563EB]">
+                        <Link href="/seller/dashboard" className="text-sm hover:text-[#2563EB]">
                             Minha Loja
                         </Link>
                     </li>
                 ) : null}
                 {session?.user?.role === 'ADMIN' ? (
                     <li>
-                        <Link href="/admin" className="hover:text-[#2563EB]">
+                        <Link href="/admin" className="text-sm hover:text-[#2563EB]">
                             Admin
                         </Link>
                     </li>
@@ -49,18 +49,18 @@ const Navbar: React.FC = () => {
             </ul>
 
             {/* Buttons */}
-            <div className="space-x-4">
+            <div className="hidden md:flex space-x-2">
                 {session ? (
                     <>
                         <button
                             onClick={() => signOut()}
-                            className="bg-transparent border border-white px-4 py-2 rounded hover:bg-[#2563EB] text-sm"
+                            className="bg-transparent border border-white px-3 py-1.5 rounded hover:bg-[#2563EB] text-xs"
                         >
                             Sair
                         </button>
                         <Link
                             href="/profile"
-                            className="bg-[#2563EB] px-4 py-2 rounded hover:bg-white hover:text-[#2563EB] text-sm"
+                            className="bg-[#2563EB] px-3 py-1.5 rounded hover:bg-white hover:text-[#2563EB] text-xs"
                         >
                             Perfil
                         </Link>
@@ -69,13 +69,13 @@ const Navbar: React.FC = () => {
                     <>
                         <Link
                             href="/login"
-                            className="bg-transparent border border-white px-4 py-2 rounded hover:bg-[#2563EB] text-sm"
+                            className="bg-transparent border border-white px-3 py-1.5 rounded hover:bg-[#2563EB] text-xs"
                         >
                             Entrar
                         </Link>
                         <Link
                             href="/register"
-                            className="bg-[#2563EB] px-4 py-2 rounded hover:bg-white hover:text-[#2563EB] text-sm"
+                            className="bg-[#2563EB] px-3 py-1.5 rounded hover:bg-white hover:text-[#2563EB] text-xs"
                         >
                             Criar conta
                         </Link>
@@ -86,27 +86,27 @@ const Navbar: React.FC = () => {
             {/* Mobile menu button */}
             <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="md:hidden text-white"
+                className="md:hidden text-white p-2"
             >
                 {mobileMenuOpen ? '✕' : '☰'}
             </button>
 
             {/* Mobile menu */}
             {mobileMenuOpen && (
-                <div className="md:hidden bg-[#101B35] p-4 mt-2 rounded-lg">
-                    <ul className="space-y-3">
+                <div className="md:hidden bg-[#101B35] p-3 mt-2 rounded-lg shadow-lg">
+                    <ul className="space-y-2">
                         <li>
-                            <Link href="/" className="block py-2 hover:text-[#2563EB]">
+                            <Link href="/" className="block py-2.5 text-sm hover:text-[#2563EB]">
                                 Início
                             </Link>
                         </li>
                         <li>
-                            <Link href="/products" className="block py-2 hover:text-[#2563EB]">
+                            <Link href="/products" className="block py-2.5 text-sm hover:text-[#2563EB]">
                                 Explorar
                             </Link>
                         </li>
                         <li>
-                            <Link href="/categories" className="block py-2 hover:text-[#2563EB]">
+                            <Link href="/categories" className="block py-2.5 text-sm hover:text-[#2563EB]">
                                 Categorias
                             </Link>
                         </li>
@@ -115,13 +115,13 @@ const Navbar: React.FC = () => {
                                 <li>
                                     <button
                                         onClick={() => signOut()}
-                                        className="block w-full text-left py-2 hover:text-[#2563EB]"
+                                        className="block w-full text-left py-2.5 text-sm hover:text-[#2563EB]"
                                     >
                                         Sair
                                     </button>
                                 </li>
                                 <li>
-                                    <Link href="/profile" className="block py-2 hover:text-[#2563EB]">
+                                    <Link href="/profile" className="block py-2.5 text-sm hover:text-[#2563EB]">
                                         Perfil
                                     </Link>
                                 </li>
@@ -129,12 +129,12 @@ const Navbar: React.FC = () => {
                         ) : (
                             <>
                                 <li>
-                                    <Link href="/login" className="block py-2 hover:text-[#2563EB]">
+                                    <Link href="/login" className="block py-2.5 text-sm hover:text-[#2563EB]">
                                         Entrar
                                     </Link>
                                 </li>
                                 <li>
-                                    <Link href="/register" className="block py-2 hover:text-[#2563EB]">
+                                    <Link href="/register" className="block py-2.5 text-sm hover:text-[#2563EB]">
                                         Criar conta
                                     </Link>
                                 </li>

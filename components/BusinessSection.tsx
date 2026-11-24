@@ -1,48 +1,93 @@
-import Image from 'next/image';
+'use client';
 
-const businesses = [
-    {
-        name: 'Tech Solutions Angola',
-        description: 'Especialistas em desenvolvimento de software e soluções digitais.',
-        location: 'Luanda',
-        image: '/images/business1.jpg',
-    },
-    {
-        name: 'Construções Premium',
-        description: 'Empresa líder em construção civil e arquitetura.',
-        location: 'Benguela',
-        image: '/images/business2.jpg',
-    },
-    {
-        name: 'Design Studio 360',
-        description: 'Profissionais de design gráfico e branding.',
-        location: 'Huambo',
-        image: '/images/business3.jpg',
-    },
-    {
-        name: 'Consultores Financeiros',
-        description: 'Consultoria financeira para empresas e indivíduos.',
-        location: 'Lubango',
-        image: '/images/business4.jpg',
-    },
-];
+import Image from 'next/image';
+import { useState, useEffect } from 'react';
+
+interface BusinessData {
+    id: string;
+    businessName: string;
+    description: string | null;
+    city: string | null;
+    image: string | null;
+}
 
 const BusinessSection: React.FC = () => {
+    const [businesses, setBusinesses] = useState<BusinessData[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+
+    useEffect(() => {
+        loadBusinesses();
+    }, []);
+
+    const loadBusinesses = async () => {
+        try {
+            const res = await fetch('/api/seller');
+            if (!res.ok) throw new Error('Failed to load businesses');
+            const data = await res.json();
+            setBusinesses(data.map((b: any) => ({
+                id: b.id,
+                businessName: b.businessName || 'Empresa',
+                description: b.description || '',
+                city: b.city || '',
+                image: b.image || '/images/business1.jpg',
+            })));
+        } catch (err) {
+            console.error('Error loading businesses:', err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (loading) {
+        return (
+            <section className="bg-white py-12 px-4">
+                <h2 className="text-2xl sm:text-3xl font-bold text-[#101B35] text-center mb-6">
+                    Descubra Empresas
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {[1, 2, 3, 4].map((i) => (
+                        <div key={i} className="bg-[#F5F7FA] rounded-lg animate-pulse">
+                            <div className="h-32 bg-gray-200 rounded-t-lg"></div>
+                            <div className="p-3">
+                                <h3 className="h-6 bg-gray-200 rounded mb-2"></h3>
+                                <p className="h-4 bg-gray-200 rounded mb-2 w-3/4"></p>
+                                <p className="h-4 bg-gray-200 rounded w-1/2"></p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </section>
+        );
+    }
+
+    if (businesses.length === 0) {
+        return (
+            <section className="bg-white py-12 px-4">
+                <h2 className="text-2xl sm:text-3xl font-bold text-[#101B35] text-center mb-6">
+                    Descubra Empresas
+                </h2>
+                <div className="text-center py-10">
+                    <p className="text-gray-500">Nenhuma empresa disponível no momento.</p>
+                </div>
+            </section>
+        );
+    }
+
     return (
-        <section className="bg-white py-16 px-6">
-            <h2 className="text-3xl font-bold text-[#101B35] text-center mb-8">
+        <section className="bg-white py-12 px-4">
+            <h2 className="text-2xl sm:text-3xl font-bold text-[#101B35] text-center mb-6">
                 Descubra Empresas
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
-                {businesses.map((business, index) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {businesses.map((business) => (
                     <div
-                        key={index}
-                        className="bg-[#F5F7FA] rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 border border-gray-100"
+                        key={business.id}
+                        className="bg-[#F5F7FA] rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-100"
                     >
-                        <div className="relative h-40 overflow-hidden rounded-t-lg bg-gray-200">
+                        <div className="relative h-32 sm:h-40 overflow-hidden rounded-t-lg bg-gray-200">
                             <Image
-                                src={business.image}
-                                alt={business.name}
+                                src={business.image || '/images/business1.jpg'}
+                                alt={business.businessName}
                                 fill
                                 className="object-cover"
                                 sizes="(max-width: 640px) 48vw, (max-width: 1024px) 24vw, 12vw"
@@ -52,12 +97,12 @@ const BusinessSection: React.FC = () => {
                                 blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAf/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAVAQEBAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwA/AD//2Q=="
                             />
                         </div>
-                        <div className="p-4">
-                            <h3 className="text-lg font-semibold text-[#101B35]">
-                                {business.name}
+                        <div className="p-3 sm:p-4">
+                            <h3 className="text-base sm:text-lg font-semibold text-[#101B35]">
+                                {business.businessName}
                             </h3>
                             <p className="text-gray-500 mb-2">{business.description}</p>
-                            <p className="text-gray-500">Localização: {business.location}</p>
+                            <p className="text-gray-500">Localização: {business.city}</p>
                         </div>
                     </div>
                 ))}

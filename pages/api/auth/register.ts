@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import bcrypt from 'bcryptjs';
-import { getDb } from '@/lib/prisma';
+import prisma from '@/lib/prisma';
 
 export default async function handler(
     req: NextApiRequest,
@@ -18,11 +18,9 @@ export default async function handler(
     };
 
     try {
-        const db = getDb();
-
-        const existingUser = await db.orm.public.User
-            .where((u) => u.email.eq(body.email))
-            .first();
+        const existingUser = await prisma.user.findUnique({
+            where: { email: body.email },
+        });
 
         if (existingUser) {
             return res.status(400).json({ error: 'Este email já está cadastrado' });
@@ -30,12 +28,14 @@ export default async function handler(
 
         const hashedPassword = await bcrypt.hash(body.password, 12);
 
-        await db.orm.public.User.create({
-            name: body.name,
-            email: body.email,
-            password: hashedPassword,
-            phone: body.phone || null,
-            role: 'CUSTOMER' as never,
+        await prisma.user.create({
+            data: {
+                name: body.name,
+                email: body.email,
+                password: hashedPassword,
+                phone: body.phone || null,
+                role: 'CUSTOMER',
+            },
         });
 
         return res.status(200).json({ success: true });
