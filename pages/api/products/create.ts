@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { getServerSession } from 'next-auth';
-import { getDb } from '@/lib/prisma';
-import { getAuthOptions } from '@/lib/auth';
+import prisma from '@/lib/prisma';
+import { authOptions } from '@/lib/auth';
 
 export default async function handler(
     req: NextApiRequest,
@@ -11,7 +11,7 @@ export default async function handler(
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    const session = await getServerSession(req, res, getAuthOptions());
+    const session = await getServerSession(req, res, authOptions);
     if (!session?.user?.id) {
         return res.status(401).json({ error: 'Você precisa estar logado para anunciar produtos' });
     }
@@ -46,11 +46,9 @@ export default async function handler(
     }
 
     try {
-        const db = getDb();
-
-        const sellerProfile = await db.orm.public.SellerProfile
-            .where({ userId: session.user.id })
-            .first();
+        const sellerProfile = await prisma.sellerProfile.findUnique({
+            where: { userId: session.user.id },
+        });
 
         if (!sellerProfile) {
             return res.status(400).json({ error: 'Você precisa se cadastrar como vendedor primeiro' });
@@ -61,28 +59,29 @@ export default async function handler(
             .replace(/[^a-z0-9]+/g, '-')
             .replace(/-+$/, '');
 
-        const product = await db.orm.public.Product.create({
-            name,
-            slug,
-            description,
-            price: String(parseFloat(price)),
-            currency: 'KZ',
-            stock: parseInt(stock, 10) || 0,
-            condition: condition as any,
-            location,
-            city,
-            country: 'Angola',
-            sellerId: session.user.id,
-            categoryId,
-            isActive: true,
-            images: (i: any) =>
-                i.create(
-                    images.map((file, index) => ({
+        const product = await prisma.product.create({
+            data: {
+                name,
+                slug,
+                description,
+                price: parseFloat(price),
+                currency: 'KZ',
+                stock: parseInt(stock, 10) || 0,
+                condition: condition as any,
+                location,
+                city,
+                country: 'Angola',
+                sellerId: session.user.id,
+                categoryId,
+                isActive: true,
+                images: {
+                    create: images.map((file, index) => ({
                         url: `/uploads/${file.name}`,
                         alt: name,
                         isPrimary: index === 0,
-                    }))
-                ),
+                    })),
+                },
+            },
         });
 
         return res.status(200).json({ slug: product.slug });

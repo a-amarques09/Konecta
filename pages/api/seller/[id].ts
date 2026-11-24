@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getDb } from '@/lib/prisma';
+import prisma from '@/lib/prisma';
 
 export default async function handler(
     req: NextApiRequest,
@@ -12,27 +12,29 @@ export default async function handler(
     const { id } = req.query as { id: string };
 
     try {
-        const db = getDb();
-
-        const profile = await db.orm.public.SellerProfile
-            .where({ id })
-            .include('user', (u) =>
-                u.include('products', (p) =>
-                    p
-                        .where({ isActive: true })
-                        .include('images', (img) =>
-                            img.where({ isPrimary: true }).limit(1)
-                        )
-                        .orderBy((pr) => pr.createdAt.desc())
-                )
-            )
-            .first();
+        const profile = await prisma.sellerProfile.findUnique({
+            where: { id },
+            include: {
+                user: {
+                    include: {
+                        products: {
+                            where: { isActive: true },
+                            include: {
+                                images: {
+                                    where: { isPrimary: true },
+                                    take: 1,
+                                },
+                            },
+                            orderBy: { createdAt: 'desc' },
+                        },
+                    },
+                },
+            },
+        });
 
         if (!profile) {
             return res.status(404).json({ error: 'Vendedor não encontrado' });
         }
-
-        const user = profile.user as any;
 
         return res.status(200).json({
             id: profile.id,
@@ -50,11 +52,11 @@ export default async function handler(
             totalSales: profile.totalSales,
             createdAt: profile.createdAt,
             user: {
-                id: user.id,
-                name: user.name,
-                email: user.email,
-                image: user.image,
-                products: user.products.map((p: any) => ({
+                id: profile.user.id,
+                name: profile.user.name,
+                email: profile.user.email,
+                image: profile.user.image,
+                products: profile.user.products.map((p: any) => ({
                     id: p.id,
                     name: p.name,
                     price: Number(p.price),

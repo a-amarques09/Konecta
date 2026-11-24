@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getDb } from '@/lib/prisma';
+import prisma from '@/lib/prisma';
 
 export default async function handler(
     req: NextApiRequest,
@@ -12,22 +12,32 @@ export default async function handler(
     const { slug } = req.query as { slug: string };
 
     try {
-        const db = getDb();
-
-        const cat = await db.orm.public.Category
-            .where({ slug })
-            .include('products', (p) =>
-                p
-                    .where({ isActive: true })
-                    .include('images', (img) =>
-                        img.where({ isPrimary: true }).limit(1)
-                    )
-                    .include('seller', (s) => s.include('sellerProfile'))
-                    .orderBy((pr) => pr.createdAt.desc())
-            )
-            .include('children', (ch) => ch.include('products', (p) => p.count()))
-            .include('parent')
-            .first();
+        const cat = await prisma.category.findUnique({
+            where: { slug },
+            include: {
+                products: {
+                    where: { isActive: true },
+                    include: {
+                        images: {
+                            where: { isPrimary: true },
+                            take: 1,
+                        },
+                        seller: {
+                            include: {
+                                sellerProfile: true,
+                            },
+                        },
+                    },
+                    orderBy: { createdAt: 'desc' },
+                },
+                children: {
+                    include: {
+                        products: true,
+                    },
+                },
+                parent: true,
+            },
+        });
 
         if (!cat) {
             return res.status(404).json({ error: 'Categoria não encontrada' });
@@ -40,7 +50,7 @@ export default async function handler(
             description: cat.description,
             image: cat.image,
             parentId: cat.parentId,
-            products: (cat.products as any[]).map((p) => ({
+            products: cat.products.map((p: any) => ({
                 id: p.id,
                 name: p.name,
                 slug: p.slug,
@@ -56,11 +66,11 @@ export default async function handler(
                     sellerProfile: p.seller.sellerProfile,
                 },
             })),
-            children: (cat.children as any[]).map((ch) => ({
+            children: cat.children.map((ch: any) => ({
                 id: ch.id,
                 name: ch.name,
                 slug: ch.slug,
-                _count: { products: ch.products },
+                _count: { products: ch.products.length },
             })),
             parent: cat.parent,
         });

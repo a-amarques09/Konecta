@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getDb } from '@/lib/prisma';
+import prisma from '@/lib/prisma';
 
 export default async function handler(
     req: NextApiRequest,
@@ -12,23 +12,28 @@ export default async function handler(
     const { slug } = req.query as { slug: string };
 
     try {
-        const db = getDb();
-
-        const productData = await db.orm.public.Product
-            .where({ slug })
-            .include('seller', (s) => s.include('sellerProfile'))
-            .include('category')
-            .include('images')
-            .first();
+        const productData = await prisma.product.findUnique({
+            where: { slug },
+            include: {
+                seller: {
+                    include: {
+                        sellerProfile: true,
+                    },
+                },
+                category: true,
+                images: true,
+            },
+        });
 
         if (!productData) {
             return res.status(404).json({ error: 'Produto não encontrado' });
         }
 
         // Increment view count
-        await db.orm.public.Product
-            .where({ id: productData.id })
-            .update({ views: productData.views + 1 });
+        await prisma.product.update({
+            where: { id: productData.id },
+            data: { views: productData.views + 1 },
+        });
 
         const images = [...productData.images].sort(
             (a: any, b: any) => Number(b.isPrimary) - Number(a.isPrimary)

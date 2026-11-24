@@ -1,5 +1,4 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import service from '../../../service.mjs';
 
 export default async function handler(
     req: NextApiRequest,
@@ -7,7 +6,7 @@ export default async function handler(
 ) {
     // Verify cron secret
     const authHeader = req.headers.authorization;
-    const cronSecret = service.input().cronSecret.expose();
+    const cronSecret = process.env.CRON_SECRET;
     if (authHeader !== `Bearer ${cronSecret}`) {
         return res.status(401).json({ error: 'Unauthorized' });
     }
