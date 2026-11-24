@@ -36,13 +36,38 @@ const Register: React.FC = () => {
         setError('');
         setSuccess('');
 
+        if (formData.name.length < 2) {
+            setError('O nome deve ter pelo menos 2 caracteres');
+            return;
+        }
+
         if (formData.password !== formData.confirmPassword) {
             setError('As senhas não coincidem');
             return;
         }
 
-        if (formData.password.length < 6) {
-            setError('A senha deve ter pelo menos 6 caracteres');
+        if (formData.password.length < 8) {
+            setError('A senha deve ter pelo menos 8 caracteres');
+            return;
+        }
+
+        if (!/[A-Z]/.test(formData.password)) {
+            setError('A senha deve conter pelo menos uma letra maiúscula');
+            return;
+        }
+
+        if (!/[a-z]/.test(formData.password)) {
+            setError('A senha deve conter pelo menos uma letra minúscula');
+            return;
+        }
+
+        if (!/[0-9]/.test(formData.password)) {
+            setError('A senha deve conter pelo menos um número');
+            return;
+        }
+
+        if (!/[^A-Za-z0-9]/.test(formData.password)) {
+            setError('A senha deve conter pelo menos um caractere especial');
             return;
         }
 
@@ -157,7 +182,7 @@ const Register: React.FC = () => {
                             value={formData.password}
                             onChange={handleChange}
                             required
-                            minLength={6}
+                            minLength={8}
                             className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#2563EB]"
                             placeholder="••••••••"
                         />
